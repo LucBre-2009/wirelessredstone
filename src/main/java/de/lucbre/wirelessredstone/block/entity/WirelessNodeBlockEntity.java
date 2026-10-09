@@ -11,9 +11,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 public final class WirelessNodeBlockEntity extends BlockEntity {
+    private static final Set<WirelessNodeBlockEntity> LOADED_SENDERS = new HashSet<>();
+
     private int frequency = 1;
-    private int range = 16;
+    // 0 means unlimited within currently loaded chunks.
+    private int range = 2048;
     private int tickCounter;
 
     public WirelessNodeBlockEntity(BlockPos pos, BlockState state) {
@@ -23,6 +30,20 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
     public int frequency() { return frequency; }
     public int range() { return range; }
 
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (getBlockState().getBlock() instanceof WirelessSenderBlock) {
+            LOADED_SENDERS.add(this);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        LOADED_SENDERS.remove(this);
+        super.setRemoved();
+    }
+
     public void setFrequency(int frequency) {
         if (level == null || level.isClientSide()) return;
         this.frequency = Math.max(0, Math.min(256, frequency));
@@ -31,7 +52,7 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
 
     public void cycleRange() {
         if (level == null || level.isClientSide()) return;
-        range = range == 4 ? 8 : range == 8 ? 16 : 4;
+        range = range == 1024 ? 2048 : range == 2048 ? 0 : 1024;
         setChanged();
     }
 
@@ -65,33 +86,33 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
             }
         }
         frequency = Math.max(0, Math.min(256, input.getIntOr("frequency", legacyFrequency)));
-        int savedRange = input.getIntOr("range", 16);
-        range = savedRange == 4 || savedRange == 8 || savedRange == 16 ? savedRange : 16;
+        int savedRange = input.getIntOr("range", 2048);
+        // Old prototype ranges (4/8/16) are upgraded to the new default.
+        range = savedRange == 1024 || savedRange == 2048 || savedRange == 0 ? savedRange : 2048;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WirelessNodeBlockEntity entity) {
         if (level.isClientSide() || !(state.getBlock() instanceof WirelessReceiverBlock)) return;
         if (++entity.tickCounter < 10) return;
         entity.tickCounter = 0;
+
         boolean powered = false;
-        int r = entity.range;
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-        search:
-        for (int x = -r; x <= r; x++) {
-            for (int y = -r; y <= r; y++) {
-                for (int z = -r; z <= r; z++) {
-                    if (x * x + y * y + z * z > r * r) continue;
-                    cursor.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                    if (level.getBlockEntity(cursor) instanceof WirelessNodeBlockEntity sender
-                            && level.getBlockState(cursor).getBlock() instanceof WirelessSenderBlock
-                            && sender.frequency == entity.frequency
-                            && level.hasNeighborSignal(cursor)) {
-                        powered = true;
-                        break search;
-                    }
-                }
+        long maxDistanceSqr = entity.range == 0 ? Long.MAX_VALUE : (long) entity.range * entity.range;
+        Iterator<WirelessNodeBlockEntity> iterator = LOADED_SENDERS.iterator();
+        while (iterator.hasNext()) {
+            WirelessNodeBlockEntity sender = iterator.next();
+            if (sender.isRemoved() || sender.level == null) {
+                iterator.remove();
+                continue;
+            }
+            if (sender.level != level || sender.frequency != entity.frequency) continue;
+            if (sender.worldPosition.distSqr(pos) > maxDistanceSqr) continue;
+            if (level.hasNeighborSignal(sender.worldPosition)) {
+                powered = true;
+                break;
             }
         }
+
         if (state.getBlock() instanceof WirelessReceiverBlock receiver) {
             receiver.setPowered(level, pos, state, powered);
         }
