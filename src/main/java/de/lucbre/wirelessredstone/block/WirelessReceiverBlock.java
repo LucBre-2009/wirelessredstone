@@ -1,6 +1,5 @@
 package de.lucbre.wirelessredstone.block;
 
-import com.mojang.serialization.MapCodec;
 import de.lucbre.wirelessredstone.WirelessRedstone;
 import de.lucbre.wirelessredstone.block.entity.WirelessNodeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -27,18 +26,30 @@ public final class WirelessReceiverBlock extends BaseEntityBlock {
         registerDefaultState(stateDefinition.any().setValue(POWERED, false));
     }
 
-    @Override protected MapCodec<? extends BaseEntityBlock> codec() { return simpleCodec(WirelessReceiverBlock::new); }
-    @Override protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) { builder.add(POWERED); }
-    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new WirelessNodeBlockEntity(pos, state); }
-    @Override public boolean isSignalSource(BlockState state) { return true; }
-    @Override public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) { return state.getValue(POWERED) ? 15 : 0; }
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+        builder.add(POWERED);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new WirelessNodeBlockEntity(pos, state);
+    }
+
+    @Override
+    public boolean isSignalSource(BlockState state) { return true; }
+
+    @Override
+    public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return state.getValue(POWERED) ? 15 : 0;
+    }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof WirelessNodeBlockEntity node)) return InteractionResult.PASS;
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) node.cycleRange(); else node.cycleChannel();
-            player.displayClientMessage(Component.literal("Wireless Receiver | Channel: " + node.channel() + " | Range: " + node.range()), true);
+            player.sendSystemMessage(Component.literal("Wireless Receiver | Channel: " + node.channel() + " | Range: " + node.range()));
         }
         return InteractionResult.SUCCESS;
     }

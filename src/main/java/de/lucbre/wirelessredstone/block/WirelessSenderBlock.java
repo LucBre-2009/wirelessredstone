@@ -1,6 +1,5 @@
 package de.lucbre.wirelessredstone.block;
 
-import com.mojang.serialization.MapCodec;
 import de.lucbre.wirelessredstone.WirelessRedstone;
 import de.lucbre.wirelessredstone.block.entity.WirelessNodeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -18,15 +17,17 @@ import net.minecraft.world.phys.BlockHitResult;
 public final class WirelessSenderBlock extends BaseEntityBlock {
     public WirelessSenderBlock(Properties properties) { super(properties); }
 
-    @Override protected MapCodec<? extends BaseEntityBlock> codec() { return simpleCodec(WirelessSenderBlock::new); }
-    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new WirelessNodeBlockEntity(pos, state); }
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new WirelessNodeBlockEntity(pos, state);
+    }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof WirelessNodeBlockEntity node)) return InteractionResult.PASS;
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) node.cycleRange(); else node.cycleChannel();
-            player.displayClientMessage(Component.literal("Wireless Sender | Channel: " + node.channel() + " | Range: " + node.range()), true);
+            player.sendSystemMessage(Component.literal("Wireless Sender | Channel: " + node.channel() + " | Range: " + node.range()));
         }
         return InteractionResult.SUCCESS;
     }
