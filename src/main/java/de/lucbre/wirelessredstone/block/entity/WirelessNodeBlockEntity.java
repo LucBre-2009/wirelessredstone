@@ -4,8 +4,6 @@ import de.lucbre.wirelessredstone.WirelessRedstone;
 import de.lucbre.wirelessredstone.block.WirelessReceiverBlock;
 import de.lucbre.wirelessredstone.block.WirelessSenderBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -14,7 +12,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 public final class WirelessNodeBlockEntity extends BlockEntity {
-    private String channel = "default";
+    private int frequency = 1;
     private int range = 16;
     private int tickCounter;
 
@@ -22,20 +20,12 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
         super(WirelessRedstone.NODE_ENTITY, pos, state);
     }
 
-    public String channel() { return channel; }
+    public int frequency() { return frequency; }
     public int range() { return range; }
 
-    public void cycleChannel() {
+    public void setFrequency(int frequency) {
         if (level == null || level.isClientSide()) return;
-        if ("default".equals(channel)) channel = "channel-2";
-        else {
-            try {
-                int number = Integer.parseInt(channel.substring("channel-".length()));
-                channel = number >= 16 ? "default" : "channel-" + (number + 1);
-            } catch (RuntimeException ignored) {
-                channel = "default";
-            }
-        }
+        this.frequency = Math.max(0, Math.min(256, frequency));
         setChanged();
     }
 
@@ -58,14 +48,23 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.putString("channel", channel);
+        output.putInt("frequency", frequency);
         output.putInt("range", range);
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        channel = input.getStringOr("channel", "default");
+        String oldChannel = input.getStringOr("channel", "default");
+        int legacyFrequency = 1;
+        if (oldChannel.startsWith("channel-")) {
+            try {
+                legacyFrequency = Integer.parseInt(oldChannel.substring("channel-".length()));
+            } catch (NumberFormatException ignored) {
+                legacyFrequency = 1;
+            }
+        }
+        frequency = Math.max(0, Math.min(256, input.getIntOr("frequency", legacyFrequency)));
         int savedRange = input.getIntOr("range", 16);
         range = savedRange == 4 || savedRange == 8 || savedRange == 16 ? savedRange : 16;
     }
@@ -85,7 +84,7 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
                     cursor.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
                     if (level.getBlockEntity(cursor) instanceof WirelessNodeBlockEntity sender
                             && level.getBlockState(cursor).getBlock() instanceof WirelessSenderBlock
-                            && sender.channel.equals(entity.channel)
+                            && sender.frequency == entity.frequency
                             && level.hasNeighborSignal(cursor)) {
                         powered = true;
                         break search;

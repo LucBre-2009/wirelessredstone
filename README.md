@@ -2,16 +2,20 @@
 
 A Fabric mod for Minecraft Java 26.3.
 
-## Current prototype
+## Features
 
-- Adds a **Wireless Sender** and **Wireless Receiver** block.
+- Adds a compact **Wireless Sender** and **Wireless Receiver**.
 - The sender detects a redstone input from adjacent vanilla redstone components.
-- A receiver emits a vanilla redstone signal (strength 15) while it finds a powered sender on the same channel within its configured radius.
-- Right-click a sender or receiver to cycle through 16 channel choices (`default`, `channel-2` ... `channel-16`).
-- Shift-right-click to cycle range: 4, 8, and 16 blocks.
-- Channel and range settings are saved with the block entity.
+- The receiver emits a vanilla redstone signal (strength 15) while it finds a powered sender with the same frequency in range.
+- Right-click a sender or receiver to open a GUI and enter a numeric frequency from **0 to 256**. The frequency is saved with the block entity and no longer appears in chat.
+- Shift-right-click to cycle the range: 4, 8, and 16 blocks.
+- The receiver's indicator changes from copper-colored to red when powered.
+- Compact models use existing Minecraft textures (iron, copper, redstone block, and white wool). No external texture files or resource-pack dependency are needed.
+- The frequency screen uses standard Minecraft widgets with a compact industrial/copper-redstone look.
 
-This is an initial gameplay prototype. It does not yet include a text-entry GUI for arbitrary channel names, custom block textures, or an in-game configuration screen. Signal updates are polled by receivers, so very large numbers of receivers may affect performance.
+Frequency and range are stored per block. Existing prototype data is migrated from previous channel names where possible.
+
+Receivers check for active senders every 10 ticks, so very large numbers of receivers may affect performance.
 
 ## Build
 

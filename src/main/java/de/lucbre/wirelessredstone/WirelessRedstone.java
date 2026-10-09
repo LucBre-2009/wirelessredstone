@@ -3,16 +3,22 @@ package de.lucbre.wirelessredstone;
 import de.lucbre.wirelessredstone.block.WirelessReceiverBlock;
 import de.lucbre.wirelessredstone.block.WirelessSenderBlock;
 import de.lucbre.wirelessredstone.block.entity.WirelessNodeBlockEntity;
+import de.lucbre.wirelessredstone.network.WirelessRedstonePayloads;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
@@ -26,8 +32,7 @@ public final class WirelessRedstone implements ModInitializer {
     public static final Block WIRELESS_RECEIVER = registerBlock("wireless_receiver", WirelessReceiverBlock::new);
     public static final net.minecraft.world.level.block.entity.BlockEntityType<WirelessNodeBlockEntity> NODE_ENTITY =
             Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("wireless_node"),
-                    net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder
-                            .create(WirelessNodeBlockEntity::new, WIRELESS_SENDER, WIRELESS_RECEIVER).build());
+                    FabricBlockEntityTypeBuilder.create(WirelessNodeBlockEntity::new, WIRELESS_SENDER, WIRELESS_RECEIVER).build());
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
@@ -46,10 +51,35 @@ public final class WirelessRedstone implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        PayloadTypeRegistry.serverboundPlay().register(WirelessRedstonePayloads.RequestFrequency.TYPE, WirelessRedstonePayloads.RequestFrequency.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(WirelessRedstonePayloads.SetFrequency.TYPE, WirelessRedstonePayloads.SetFrequency.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(WirelessRedstonePayloads.OpenFrequency.TYPE, WirelessRedstonePayloads.OpenFrequency.CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(WirelessRedstonePayloads.RequestFrequency.TYPE, (payload, context) -> {
+            ServerPlayer player = context.player();
+            Level level = player.level();
+            if (player.blockPosition().distSqr(payload.pos()) > 64) return;
+            if (!(level.getBlockEntity(payload.pos()) instanceof WirelessNodeBlockEntity node)) return;
+            Block block = level.getBlockState(payload.pos()).getBlock();
+            if (!(block instanceof WirelessSenderBlock) && !(block instanceof WirelessReceiverBlock)) return;
+            ServerPlayNetworking.send(player, new WirelessRedstonePayloads.OpenFrequency(payload.pos(), node.frequency(), node.range()));
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(WirelessRedstonePayloads.SetFrequency.TYPE, (payload, context) -> {
+            ServerPlayer player = context.player();
+            Level level = player.level();
+            if (payload.frequency() < 0 || payload.frequency() > 256) return;
+            if (player.blockPosition().distSqr(payload.pos()) > 64) return;
+            if (!(level.getBlockEntity(payload.pos()) instanceof WirelessNodeBlockEntity node)) return;
+            Block block = level.getBlockState(payload.pos()).getBlock();
+            if (!(block instanceof WirelessSenderBlock) && !(block instanceof WirelessReceiverBlock)) return;
+            node.setFrequency(payload.frequency());
+        });
+
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(tab -> {
             tab.accept(WIRELESS_SENDER.asItem());
             tab.accept(WIRELESS_RECEIVER.asItem());
         });
-        LOGGER.info("Wireless Redstone loaded: sender and receiver blocks registered.");
+        LOGGER.info("Wireless Redstone loaded: numeric frequency menu and compact blocks registered.");
     }
 }
