@@ -1,31 +1,28 @@
-# Wireless Redstone — Fabric 26.3 project scaffold
+# Wireless Redstone
 
-This is a **development scaffold**, not a finished wireless-redstone mod.
-It currently registers two placeable blocks:
+A Fabric mod for Minecraft Java 26.3.
 
-- `wirelessredstone:wireless_sender`
-- `wirelessredstone:wireless_link`
+## Current prototype
 
-The frequency system, range checks, redstone output logic, networking, and screen UI are **not implemented yet**. Do not install this as if those features already work.
+- Adds a **Wireless Sender** and **Wireless Receiver** block.
+- The sender detects a redstone input from adjacent vanilla redstone components.
+- A receiver emits a vanilla redstone signal (strength 15) while it finds a powered sender on the same channel within its configured radius.
+- Right-click a sender or receiver to cycle through 16 channel choices (`default`, `channel-2` ... `channel-16`).
+- Shift-right-click to cycle range: 4, 8, and 16 blocks.
+- Channel and range settings are saved with the block entity.
 
-## Build on Windows
+This is an initial gameplay prototype. It does not yet include a text-entry GUI for arbitrary channel names, custom block textures, or an in-game configuration screen. Signal updates are polled by receivers, so very large numbers of receivers may affect performance.
 
-1. Install a Java 25 JDK and make sure `java -version` uses Java 25 or newer.
-2. Extract this ZIP to a normal folder.
-3. Double-click `build.bat`.
-4. On the first run, the script downloads Gradle 9.6.0 and Gradle downloads the Minecraft/Fabric build dependencies. An internet connection is required.
-5. If the build succeeds, the JAR is copied into `output`.
+## Build
 
-No IDE, Python, Docker, or manually installed Gradle is required. Java 25 and internet access are required.
+Requires Java 25.
 
-## Client and server
+```bash
+./gradlew build
+```
 
-Loom combines the common and client source sets into one mod JAR. The same JAR is intended for the Fabric client and Fabric server. The current scaffold has not yet been compiled or tested in this environment.
+The mod JAR is produced in `build/libs/`.
 
-## Version targets
+## Install
 
-- Minecraft Java: 26.3
-- Fabric Loader: 0.19.5
-- Fabric Loom: 1.17
-- Gradle: 9.6.0
-- Java: 25+
+Copy `WirelessRedstone-0.1.0.jar` from `build/libs/` into the `mods` folder of a Minecraft 26.3 Fabric client/server. Fabric API must also be installed.

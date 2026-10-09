@@ -3,7 +3,7 @@
   "id": "wirelessredstone",
   "version": "${version}",
   "name": "Wireless Redstone",
-  "description": "A Fabric mod project scaffold for frequency-based wireless redstone.",
+  "description": "Frequency-based wireless redstone sender and receiver blocks for Minecraft Java 26.3.",
   "authors": ["LuCBre"],
   "license": "All-Rights-Reserved",
   "environment": "*",
@@ -13,7 +13,8 @@
   },
   "depends": {
     "fabricloader": ">=0.19.5",
-    "minecraft": "26.3",
-    "java": ">=25"
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
   }
 }
