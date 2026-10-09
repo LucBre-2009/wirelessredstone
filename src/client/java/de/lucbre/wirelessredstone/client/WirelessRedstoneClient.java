@@ -14,7 +14,7 @@ public final class WirelessRedstoneClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(WirelessRedstonePayloads.OpenFrequency.TYPE, (payload, context) ->
-                context.client().execute(() -> context.client().gui().setScreen(
+                context.client().execute(() -> context.client().gui.setScreen(
                         new FrequencyScreen(payload.pos(), payload.frequency(), payload.range()))));
 
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
