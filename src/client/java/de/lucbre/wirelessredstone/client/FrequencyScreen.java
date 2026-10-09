@@ -52,7 +52,7 @@ public final class FrequencyScreen extends Screen {
         int left = (this.width - 240) / 2;
         int top = (this.height - 112) / 2;
         graphics.text(this.font, "Frequency (0-256)", left + 20, top + 22, 0xFFFFFFFF, true);
-        graphics.text(this.font, "Current range: " + this.range + " blocks", left + 20, top + 104, 0xFFB8B8B8, true);
+        graphics.text(this.font, "Range: " + (this.range == 0 ? "Unlimited (loaded chunks)" : this.range + " blocks"), left + 20, top + 104, 0xFFB8B8B8, true);
     }
 
     @Override
