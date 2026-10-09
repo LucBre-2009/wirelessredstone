@@ -40,7 +40,7 @@ public final class FrequencyScreen extends Screen {
             int frequency = Integer.parseInt(this.frequencyField.getValue().trim());
             if (frequency < 0 || frequency > 256) return;
             ClientPlayNetworking.send(new WirelessRedstonePayloads.SetFrequency(this.pos, frequency));
-            this.minecraft.setScreen(null);
+            this.minecraft.gui.setScreen(null);
         } catch (NumberFormatException ignored) {
             this.frequencyField.setFocused(true);
         }
@@ -57,6 +57,6 @@ public final class FrequencyScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(null);
+        this.minecraft.gui.setScreen(null);
     }
 }
