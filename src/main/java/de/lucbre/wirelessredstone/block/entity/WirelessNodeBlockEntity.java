@@ -25,18 +25,15 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
 
     public WirelessNodeBlockEntity(BlockPos pos, BlockState state) {
         super(WirelessRedstone.NODE_ENTITY, pos, state);
+        // Block entities are constructed as their chunks are loaded or when placed.
+        // Register senders here because this Minecraft version has no BlockEntity.onLoad().
+        if (state.getBlock() instanceof WirelessSenderBlock) {
+            LOADED_SENDERS.add(this);
+        }
     }
 
     public int frequency() { return frequency; }
     public int range() { return range; }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (getBlockState().getBlock() instanceof WirelessSenderBlock) {
-            LOADED_SENDERS.add(this);
-        }
-    }
 
     @Override
     public void setRemoved() {
