@@ -1,78 +1,47 @@
 {
   "textures": {
-    "wool": "wirelessredstone:block/wireless_receiver_casing",
-    "copper": "wirelessredstone:block/wireless_receiver_trim",
-    "indicator": "wirelessredstone:block/wireless_receiver_indicator_off"
+    "top": "wirelessredstone:block/wireless_receiver_top",
+    "side": "wirelessredstone:block/wireless_receiver_side",
+    "red": "wirelessredstone:block/wireless_button_red",
+    "antenna": "wirelessredstone:block/wireless_antenna"
   },
   "elements": [
     {
       "from": [
-        1,
         0,
-        1
+        0,
+        0
       ],
       "to": [
-        15,
-        2,
-        15
+        16,
+        4,
+        16
       ],
       "faces": {
         "north": {
-          "texture": "#wool"
+          "texture": "#side"
         },
         "south": {
-          "texture": "#wool"
+          "texture": "#side"
         },
         "east": {
-          "texture": "#wool"
+          "texture": "#side"
         },
         "west": {
-          "texture": "#wool"
+          "texture": "#side"
         },
         "up": {
-          "texture": "#wool"
+          "texture": "#top"
         },
         "down": {
-          "texture": "#wool"
-        }
-      }
-    },
-    {
-      "from": [
-        2,
-        2,
-        2
-      ],
-      "to": [
-        14,
-        3,
-        14
-      ],
-      "faces": {
-        "north": {
-          "texture": "#copper"
-        },
-        "south": {
-          "texture": "#copper"
-        },
-        "east": {
-          "texture": "#copper"
-        },
-        "west": {
-          "texture": "#copper"
-        },
-        "up": {
-          "texture": "#copper"
-        },
-        "down": {
-          "texture": "#copper"
+          "texture": "#side"
         }
       }
     },
     {
       "from": [
         6,
-        3,
+        4,
         6
       ],
       "to": [
@@ -82,22 +51,54 @@
       ],
       "faces": {
         "north": {
-          "texture": "#indicator"
+          "texture": "#red"
         },
         "south": {
-          "texture": "#indicator"
+          "texture": "#red"
         },
         "east": {
-          "texture": "#indicator"
+          "texture": "#red"
         },
         "west": {
-          "texture": "#indicator"
+          "texture": "#red"
         },
         "up": {
-          "texture": "#indicator"
+          "texture": "#red"
         },
         "down": {
-          "texture": "#indicator"
+          "texture": "#red"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        4,
+        3
+      ],
+      "to": [
+        13,
+        15,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#antenna"
+        },
+        "south": {
+          "texture": "#antenna"
+        },
+        "east": {
+          "texture": "#antenna"
+        },
+        "west": {
+          "texture": "#antenna"
+        },
+        "up": {
+          "texture": "#antenna"
+        },
+        "down": {
+          "texture": "#side"
         }
       }
     }
