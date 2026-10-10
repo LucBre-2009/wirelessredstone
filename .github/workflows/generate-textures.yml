@@ -27,5 +27,6 @@ jobs:
           git add src/main/resources/assets/wirelessredstone/textures/block/*.png
           if ! git diff --cached --quiet; then
             git commit -m "Add custom WirelessRedstone pixel textures"
+            git pull --rebase origin main
             git push
           fi
