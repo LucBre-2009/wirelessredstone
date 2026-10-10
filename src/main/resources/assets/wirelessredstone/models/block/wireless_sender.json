@@ -4,7 +4,7 @@
     "side": "wirelessredstone:block/wireless_sender_side",
     "blue": "wirelessredstone:block/wireless_button_blue",
     "red": "wirelessredstone:block/wireless_button_red",
-    "antenna": "wirelessredstone:block/wireless_antenna"
+    "antenna": "wirelessredstone:block/wireless_sender_antenna"
   },
   "elements": [
     {
