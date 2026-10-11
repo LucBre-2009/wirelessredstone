@@ -23,6 +23,18 @@ public final class WirelessSenderBlock extends BaseEntityBlock {
     public WirelessSenderBlock(Properties properties) { super(properties); }
 
     @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        BlockPos support = pos.below();
+        return level.getBlockState(support).isFaceSturdy(level, support, Direction.UP);
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
+            Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+        return canSurvive(state, level, pos) ? state : net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+    }
+
+    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
