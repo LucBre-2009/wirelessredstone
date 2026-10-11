@@ -28,14 +28,16 @@ public final class WirelessSwitchBlock extends BaseEntityBlock {
     private static final VoxelShape FLOOR_PRESSED_SHAPE = Block.box(5, 0, 6, 11, 1, 10);
     private static final VoxelShape CEILING_SHAPE = Block.box(5, 14, 6, 11, 16, 10);
     private static final VoxelShape CEILING_PRESSED_SHAPE = Block.box(5, 15, 6, 11, 16, 10);
-    private static final VoxelShape NORTH_SHAPE = Block.box(6, 5, 0, 10, 11, 2);
-    private static final VoxelShape NORTH_PRESSED_SHAPE = Block.box(6, 5, 0, 10, 11, 1);
-    private static final VoxelShape SOUTH_SHAPE = Block.box(6, 5, 14, 10, 11, 16);
-    private static final VoxelShape SOUTH_PRESSED_SHAPE = Block.box(6, 5, 15, 10, 11, 16);
-    private static final VoxelShape WEST_SHAPE = Block.box(0, 5, 6, 2, 11, 10);
-    private static final VoxelShape WEST_PRESSED_SHAPE = Block.box(0, 5, 6, 1, 11, 10);
-    private static final VoxelShape EAST_SHAPE = Block.box(14, 5, 6, 16, 11, 10);
-    private static final VoxelShape EAST_PRESSED_SHAPE = Block.box(15, 5, 6, 16, 11, 10);
+    // Wall shapes are 6 pixels wide and 4 pixels tall, matching the visible model.
+    // The shape must be on the same side as the switch model, opposite its support block.
+    private static final VoxelShape NORTH_SHAPE = Block.box(5, 6, 14, 11, 10, 16);
+    private static final VoxelShape NORTH_PRESSED_SHAPE = Block.box(5, 6, 15, 11, 10, 16);
+    private static final VoxelShape SOUTH_SHAPE = Block.box(5, 6, 0, 11, 10, 2);
+    private static final VoxelShape SOUTH_PRESSED_SHAPE = Block.box(5, 6, 0, 11, 10, 1);
+    private static final VoxelShape WEST_SHAPE = Block.box(14, 6, 5, 16, 10, 11);
+    private static final VoxelShape WEST_PRESSED_SHAPE = Block.box(15, 6, 5, 16, 10, 11);
+    private static final VoxelShape EAST_SHAPE = Block.box(0, 6, 5, 2, 10, 11);
+    private static final VoxelShape EAST_PRESSED_SHAPE = Block.box(0, 6, 5, 1, 10, 11);
 
     public WirelessSwitchBlock(Properties properties) {
         super(properties);
