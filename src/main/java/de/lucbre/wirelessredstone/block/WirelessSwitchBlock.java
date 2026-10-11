@@ -23,12 +23,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class WirelessSwitchBlock extends BaseEntityBlock {
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
-    private static final VoxelShape FLOOR_SHAPE = Block.box(2, 0, 2, 14, 5, 14);
-    private static final VoxelShape CEILING_SHAPE = Block.box(2, 11, 2, 14, 16, 14);
-    private static final VoxelShape NORTH_SHAPE = Block.box(2, 2, 0, 14, 14, 5);
-    private static final VoxelShape SOUTH_SHAPE = Block.box(2, 2, 11, 14, 14, 16);
-    private static final VoxelShape WEST_SHAPE = Block.box(0, 2, 2, 5, 14, 14);
-    private static final VoxelShape EAST_SHAPE = Block.box(11, 2, 2, 16, 14, 14);
+    // Match the vanilla button model dimensions (6x4 pixels, 2 pixels deep).
+    private static final VoxelShape FLOOR_SHAPE = Block.box(5, 0, 6, 11, 2, 10);
+    private static final VoxelShape FLOOR_PRESSED_SHAPE = Block.box(5, 0, 6, 11, 1, 10);
+    private static final VoxelShape CEILING_SHAPE = Block.box(5, 14, 6, 11, 16, 10);
+    private static final VoxelShape CEILING_PRESSED_SHAPE = Block.box(5, 15, 6, 11, 16, 10);
+    private static final VoxelShape NORTH_SHAPE = Block.box(6, 5, 0, 10, 11, 2);
+    private static final VoxelShape NORTH_PRESSED_SHAPE = Block.box(6, 5, 0, 10, 11, 1);
+    private static final VoxelShape SOUTH_SHAPE = Block.box(6, 5, 14, 10, 11, 16);
+    private static final VoxelShape SOUTH_PRESSED_SHAPE = Block.box(6, 5, 15, 10, 11, 16);
+    private static final VoxelShape WEST_SHAPE = Block.box(0, 5, 6, 2, 11, 10);
+    private static final VoxelShape WEST_PRESSED_SHAPE = Block.box(0, 5, 6, 1, 11, 10);
+    private static final VoxelShape EAST_SHAPE = Block.box(14, 5, 6, 16, 11, 10);
+    private static final VoxelShape EAST_PRESSED_SHAPE = Block.box(15, 5, 6, 16, 11, 10);
 
     public WirelessSwitchBlock(Properties properties) {
         super(properties);
@@ -56,13 +63,14 @@ public final class WirelessSwitchBlock extends BaseEntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, CollisionContext context) {
+        boolean pressed = state.getValue(POWERED);
         return switch (state.getValue(DirectionalBlock.FACING)) {
-            case DOWN -> CEILING_SHAPE;
-            case NORTH -> NORTH_SHAPE;
-            case SOUTH -> SOUTH_SHAPE;
-            case WEST -> WEST_SHAPE;
-            case EAST -> EAST_SHAPE;
-            default -> FLOOR_SHAPE;
+            case DOWN -> pressed ? CEILING_PRESSED_SHAPE : CEILING_SHAPE;
+            case NORTH -> pressed ? NORTH_PRESSED_SHAPE : NORTH_SHAPE;
+            case SOUTH -> pressed ? SOUTH_PRESSED_SHAPE : SOUTH_SHAPE;
+            case WEST -> pressed ? WEST_PRESSED_SHAPE : WEST_SHAPE;
+            case EAST -> pressed ? EAST_PRESSED_SHAPE : EAST_SHAPE;
+            default -> pressed ? FLOOR_PRESSED_SHAPE : FLOOR_SHAPE;
         };
     }
 
