@@ -35,7 +35,7 @@ public final class WirelessSwitchBlock extends BaseEntityBlock {
     private static final VoxelShape WEST_SHAPE = Block.box(0, 5, 5, 2, 11, 11);
     private static final VoxelShape WEST_PRESSED_SHAPE = Block.box(0, 5, 5, 1, 11, 11);
     private static final VoxelShape EAST_SHAPE = Block.box(14, 5, 5, 16, 11, 11);
-    private static final VoxelShape EAST_PRESSED_SHAPE = Block.box(15, 5, 6, 16, 11, 10);
+    private static final VoxelShape EAST_PRESSED_SHAPE = Block.box(15, 5, 5, 16, 11, 11);
 
     public WirelessSwitchBlock(Properties properties) {
         super(properties);
