@@ -4,6 +4,7 @@ import de.lucbre.wirelessredstone.WirelessRedstone;
 import de.lucbre.wirelessredstone.block.WirelessLampBlock;
 import de.lucbre.wirelessredstone.block.WirelessReceiverBlock;
 import de.lucbre.wirelessredstone.block.WirelessSenderBlock;
+import de.lucbre.wirelessredstone.block.WirelessSwitchBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +27,7 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
 
     public WirelessNodeBlockEntity(BlockPos pos, BlockState state) {
         super(WirelessRedstone.NODE_ENTITY, pos, state);
-        if (state.getBlock() instanceof WirelessSenderBlock) {
+        if (state.getBlock() instanceof WirelessSenderBlock || state.getBlock() instanceof WirelessSwitchBlock) {
             LOADED_SENDERS.add(this);
         }
     }
@@ -106,7 +107,11 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
             }
             if (sender.level != level || sender.frequency != entity.frequency) continue;
             if (sender.worldPosition.distSqr(pos) > maxDistanceSqr) continue;
-            if (level.hasNeighborSignal(sender.worldPosition)) {
+            BlockState senderState = sender.getBlockState();
+            boolean sending = senderState.getBlock() instanceof WirelessSwitchBlock
+                    ? senderState.getValue(WirelessSwitchBlock.POWERED)
+                    : level.hasNeighborSignal(sender.worldPosition);
+            if (sending) {
                 powered = true;
                 break;
             }
