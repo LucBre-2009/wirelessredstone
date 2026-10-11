@@ -23,25 +23,61 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class WirelessSwitchBlock extends BaseEntityBlock {
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
-    private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 5, 14);
+    private static final VoxelShape FLOOR_SHAPE = Block.box(2, 0, 2, 14, 5, 14);
+    private static final VoxelShape CEILING_SHAPE = Block.box(2, 11, 2, 14, 16, 14);
+    private static final VoxelShape NORTH_SHAPE = Block.box(2, 2, 0, 14, 14, 5);
+    private static final VoxelShape SOUTH_SHAPE = Block.box(2, 2, 11, 14, 14, 16);
+    private static final VoxelShape WEST_SHAPE = Block.box(0, 2, 2, 5, 14, 14);
+    private static final VoxelShape EAST_SHAPE = Block.box(11, 2, 2, 16, 14, 14);
+
     public WirelessSwitchBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(DirectionalBlock.FACING, Direction.UP).setValue(POWERED, false));
     }
-    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(DirectionalBlock.FACING, POWERED); }
-    @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(DirectionalBlock.FACING, POWERED);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
         Direction face = context.getClickedFace();
         if (face == Direction.DOWN) face = Direction.UP;
         return defaultBlockState().setValue(DirectionalBlock.FACING, face);
     }
-    @Override public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction face = state.getValue(DirectionalBlock.FACING);
         BlockPos support = pos.relative(face.getOpposite());
         return level.getBlockState(support).isFaceSturdy(level, support, face);
     }
-    @Override public VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, CollisionContext context) { return SHAPE; }
-    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new WirelessNodeBlockEntity(pos, state); }
-    @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+
+    @Override
+    public VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, CollisionContext context) {
+        return switch (state.getValue(DirectionalBlock.FACING)) {
+            case DOWN -> CEILING_SHAPE;
+            case NORTH -> NORTH_SHAPE;
+            case SOUTH -> SOUTH_SHAPE;
+            case WEST -> WEST_SHAPE;
+            case EAST -> EAST_SHAPE;
+            default -> FLOOR_SHAPE;
+        };
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, CollisionContext context) {
+        return getShape(state, level, pos, context);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new WirelessNodeBlockEntity(pos, state);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player.isShiftKeyDown()) return InteractionResult.PASS;
         if (!level.isClientSide()) {
             level.setBlock(pos, state.setValue(POWERED, !state.getValue(POWERED)), 3);
@@ -49,10 +85,13 @@ public final class WirelessSwitchBlock extends BaseEntityBlock {
         }
         return InteractionResult.SUCCESS;
     }
+
     @Override public boolean isSignalSource(BlockState state) { return true; }
     @Override public int getSignal(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, Direction direction) { return state.getValue(POWERED) ? 15 : 0; }
     @Override public int getDirectSignal(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, Direction direction) { return getSignal(state, level, pos, direction); }
-    @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, WirelessRedstone.NODE_ENTITY, WirelessNodeBlockEntity::tick);
     }
 }
