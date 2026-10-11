@@ -1,6 +1,7 @@
 package de.lucbre.wirelessredstone.block.entity;
 
 import de.lucbre.wirelessredstone.WirelessRedstone;
+import de.lucbre.wirelessredstone.block.WirelessLampBlock;
 import de.lucbre.wirelessredstone.block.WirelessReceiverBlock;
 import de.lucbre.wirelessredstone.block.WirelessSenderBlock;
 import net.minecraft.core.BlockPos;
@@ -25,8 +26,6 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
 
     public WirelessNodeBlockEntity(BlockPos pos, BlockState state) {
         super(WirelessRedstone.NODE_ENTITY, pos, state);
-        // Block entities are constructed as their chunks are loaded or when placed.
-        // Register senders here because this Minecraft version has no BlockEntity.onLoad().
         if (state.getBlock() instanceof WirelessSenderBlock) {
             LOADED_SENDERS.add(this);
         }
@@ -84,12 +83,15 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
         }
         frequency = Math.max(0, Math.min(256, input.getIntOr("frequency", legacyFrequency)));
         int savedRange = input.getIntOr("range", 2048);
-        // Old prototype ranges (4/8/16) are upgraded to the new default.
         range = savedRange == 1024 || savedRange == 2048 || savedRange == 0 ? savedRange : 2048;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WirelessNodeBlockEntity entity) {
-        if (level.isClientSide() || !(state.getBlock() instanceof WirelessReceiverBlock)) return;
+        if (level.isClientSide()) return;
+        boolean isReceiver = state.getBlock() instanceof WirelessReceiverBlock;
+        boolean isLamp = state.getBlock() instanceof WirelessLampBlock;
+        if (!isReceiver && !isLamp) return;
+
         if (++entity.tickCounter < 10) return;
         entity.tickCounter = 0;
 
@@ -110,8 +112,10 @@ public final class WirelessNodeBlockEntity extends BlockEntity {
             }
         }
 
-        if (state.getBlock() instanceof WirelessReceiverBlock receiver) {
-            receiver.setPowered(level, pos, state, powered);
+        if (isReceiver) {
+            ((WirelessReceiverBlock) state.getBlock()).setPowered(level, pos, state, powered);
+        } else {
+            ((WirelessLampBlock) state.getBlock()).setLit(level, pos, state, powered);
         }
     }
 }
