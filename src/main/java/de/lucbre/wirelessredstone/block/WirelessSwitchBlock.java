@@ -24,17 +24,17 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public final class WirelessSwitchBlock extends BaseEntityBlock {
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
     // Match the vanilla button model dimensions (6x4 pixels, 2 pixels deep).
-    private static final VoxelShape FLOOR_SHAPE = Block.box(5, 0, 6, 11, 2, 10);
-    private static final VoxelShape FLOOR_PRESSED_SHAPE = Block.box(5, 0, 6, 11, 1, 10);
-    private static final VoxelShape CEILING_SHAPE = Block.box(5, 14, 6, 11, 16, 10);
-    private static final VoxelShape CEILING_PRESSED_SHAPE = Block.box(5, 15, 6, 11, 16, 10);
-    private static final VoxelShape NORTH_SHAPE = Block.box(6, 5, 0, 10, 11, 2);
-    private static final VoxelShape NORTH_PRESSED_SHAPE = Block.box(6, 5, 0, 10, 11, 1);
-    private static final VoxelShape SOUTH_SHAPE = Block.box(6, 5, 14, 10, 11, 16);
-    private static final VoxelShape SOUTH_PRESSED_SHAPE = Block.box(6, 5, 15, 10, 11, 16);
-    private static final VoxelShape WEST_SHAPE = Block.box(0, 5, 6, 2, 11, 10);
-    private static final VoxelShape WEST_PRESSED_SHAPE = Block.box(0, 5, 6, 1, 11, 10);
-    private static final VoxelShape EAST_SHAPE = Block.box(14, 5, 6, 16, 11, 10);
+    private static final VoxelShape FLOOR_SHAPE = Block.box(5, 0, 5, 11, 2, 11);
+    private static final VoxelShape FLOOR_PRESSED_SHAPE = Block.box(5, 0, 5, 11, 1, 11);
+    private static final VoxelShape CEILING_SHAPE = Block.box(5, 14, 5, 11, 16, 11);
+    private static final VoxelShape CEILING_PRESSED_SHAPE = Block.box(5, 15, 5, 11, 16, 11);
+    private static final VoxelShape NORTH_SHAPE = Block.box(5, 5, 0, 11, 11, 2);
+    private static final VoxelShape NORTH_PRESSED_SHAPE = Block.box(5, 5, 0, 11, 11, 1);
+    private static final VoxelShape SOUTH_SHAPE = Block.box(5, 5, 14, 11, 11, 16);
+    private static final VoxelShape SOUTH_PRESSED_SHAPE = Block.box(5, 5, 15, 11, 11, 16);
+    private static final VoxelShape WEST_SHAPE = Block.box(0, 5, 5, 2, 11, 11);
+    private static final VoxelShape WEST_PRESSED_SHAPE = Block.box(0, 5, 5, 1, 11, 11);
+    private static final VoxelShape EAST_SHAPE = Block.box(14, 5, 5, 16, 11, 11);
     private static final VoxelShape EAST_PRESSED_SHAPE = Block.box(15, 5, 6, 16, 11, 10);
 
     public WirelessSwitchBlock(Properties properties) {
