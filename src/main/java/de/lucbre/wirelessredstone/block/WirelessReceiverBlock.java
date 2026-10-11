@@ -4,6 +4,9 @@ import de.lucbre.wirelessredstone.WirelessRedstone;
 import de.lucbre.wirelessredstone.block.entity.WirelessNodeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.ticks.ScheduledTickAccess;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
@@ -32,6 +35,18 @@ public final class WirelessReceiverBlock extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(POWERED);
+    }
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        BlockPos support = pos.below();
+        return level.getBlockState(support).isFaceSturdy(level, support, Direction.UP);
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
+            Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+        return canSurvive(state, level, pos) ? state : net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
     }
 
     @Override
